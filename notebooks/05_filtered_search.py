@@ -1,7 +1,16 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: py:percent
+#     formats: ipynb,py:percent,ipynb
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -25,8 +34,12 @@
 
 # %%
 import _setup  # noqa: F401
+import sys
 import warnings
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 warnings.filterwarnings("ignore")  # local Qdrant warns that payload indexes are no-ops
 
@@ -69,8 +82,8 @@ cases = [
     ("không filter",   lambda d: True, None),
     ("access=internal", *access_filter("internal")),
     ("tenant=acme",     *tenant_filter("acme")),
-    ("published ≥ 2026", *recent_filter(20260101)),
-    ("acme AND ≥2026",  *combo_filter("acme", 20260101)),
+    ("published >= 2026", *recent_filter(20260101)),
+    ("acme AND >=2026",  *combo_filter("acme", 20260101)),
 ]
 
 print(f"{'filter':<18}{'sel%':>7}{'post':>8}{'fANN':>8}{'post_ms':>9}{'fann_ms':>9}")
@@ -90,7 +103,7 @@ for name, pred, qf in cases:
 
 # %% [markdown]
 # **Đọc bảng:** filter càng chặt (`sel%` càng nhỏ), post-filter càng sập. Ở
-# `acme AND ≥2026` (~4% corpus) post-filter thường về **0.00** — nó hỏi index
+# `acme AND >=2026` (~4% corpus) post-filter thường về **0.00** — nó hỏi index
 # 10 doc gần nhất *toàn corpus*, rồi vứt gần hết. Không có exception, không có
 # log lỗi: chỉ là câu trả lời tệ đi một cách im lặng.
 #
@@ -141,23 +154,3 @@ for tenant in ("acme", "globex", "initech"):
     fann = index.filtered_ann(QUERY, qf_t, k=10)
     print(f"tenant={tenant:<9} sel={selectivity(index.docs, pred_t)*100:5.1f}%  "
           f"post={post.recall_against(truth):.2f}  fANN={fann.recall_against(truth):.2f}")
-
-# %% [markdown]
-# ## Deliverable evidence
-#
-# 1. Bảng §2: recall theo độ chọn lọc — post-filter sập, filtered-ANN giữ 1.00.
-# 2. Bảng §3: over-fetch ladder — `fetch_k` cần ~50% corpus mới cứu được recall.
-# 3. Bảng §4: cả ba tenant, post-filter thua ở mọi tenant.
-#
-# ---
-#
-# ## Vibe-coding callout
-#
-# **Delegate freely:** vòng lặp in bảng, format `%`, việc dựng `models.Filter`
-# từ dict điều kiện. Đây là boilerplate, AI viết đúng ngay.
-#
-# **Think hard yourself:** *định nghĩa ground truth*. Rất nhiều người đo recall
-# của post-filter so với **top-K không filter** — và kết luận sai rằng post-filter
-# ổn. Ground truth đúng phải là "top-K chính xác **trong subset khớp filter**".
-# Nếu bạn để AI tự chọn baseline, nó thường chọn cái tiện chứ không phải cái đúng,
-# và cả bài đo trở thành vô nghĩa. Tự viết `exact_top_k()` và tự kiểm tra nó.

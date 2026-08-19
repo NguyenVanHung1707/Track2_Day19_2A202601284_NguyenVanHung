@@ -23,8 +23,14 @@ if [ ! -d ".venv" ]; then
     python3 -m venv .venv
   fi
 fi
-# shellcheck source=/dev/null
-source .venv/bin/activate
+if [ -f ".venv/bin/activate" ]; then
+  source .venv/bin/activate
+elif [ -f ".venv/Scripts/activate" ]; then
+  source .venv/Scripts/activate
+else
+  echo "[lite] Error: activate script not found in .venv"
+  exit 1
+fi
 
 # ── 3. Install deps ─────────────────────────────────────────────────────
 # `uv venv` may pick a different interpreter than the system `python3`, so the

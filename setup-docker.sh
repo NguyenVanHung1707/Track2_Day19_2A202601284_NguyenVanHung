@@ -63,8 +63,14 @@ if [ ! -d ".venv" ]; then
     python3 -m venv .venv
   fi
 fi
-# shellcheck source=/dev/null
-source .venv/bin/activate
+if [ -f ".venv/bin/activate" ]; then
+  source .venv/bin/activate
+elif [ -f ".venv/Scripts/activate" ]; then
+  source .venv/Scripts/activate
+else
+  echo "[docker] Error: activate script not found in .venv"
+  exit 1
+fi
 
 # ── 4. Install lite + docker extras ─────────────────────────────────────
 NEED_DILL_OVERRIDE=$(python -c 'import sys; print(1 if sys.version_info >= (3,14) else 0)')

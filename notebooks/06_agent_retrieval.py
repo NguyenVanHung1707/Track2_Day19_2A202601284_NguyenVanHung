@@ -1,7 +1,16 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: py:percent
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
+#   kernelspec:
+#     display_name: lakehouse
+#     language: python
+#     name: lakehouse
 # ---
 
 # %% [markdown]
@@ -21,8 +30,12 @@
 # %%
 import _setup  # noqa: F401
 import json
+import sys
 import warnings
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 warnings.filterwarnings("ignore")
 

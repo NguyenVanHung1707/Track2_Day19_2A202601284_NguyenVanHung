@@ -1,7 +1,16 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: py:percent
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.5
+#   kernelspec:
+#     display_name: lakehouse
+#     language: python
+#     name: lakehouse
 # ---
 
 # %% [markdown]
@@ -27,6 +36,7 @@
 
 # %%
 import _setup  # noqa: F401
+import sys
 import subprocess
 import warnings
 from pathlib import Path
@@ -158,10 +168,10 @@ print(f"\n'lift ảo' sẽ mất khi lên production: {auc_lat - auc_pit:+.3f} A
 
 # %%
 repo = ROOT / "app" / "feast_repo_ondemand"
-subprocess.run(["python", str(ROOT / "scripts" / "gen_spend.py")], check=True,
+subprocess.run([sys.executable, str(ROOT / "scripts" / "gen_spend.py")], check=True,
                capture_output=True)
-subprocess.run(["feast", "apply"], cwd=repo, check=True, capture_output=True)
-subprocess.run(["feast", "materialize-incremental", "2027-01-01T00:00:00"],
+subprocess.run([sys.executable, "-m", "feast", "apply"], cwd=repo, check=True, capture_output=True)
+subprocess.run([sys.executable, "-m", "feast", "materialize-incremental", "2027-01-01T00:00:00"],
                cwd=repo, check=True, capture_output=True)
 print("feast apply + materialize OK")
 

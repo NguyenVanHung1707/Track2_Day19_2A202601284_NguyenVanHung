@@ -1,0 +1,2 @@
+# Allow ipynb to be slightly newer than the paired .py without error
+outdated_text_notebook_margin = 86400  # 24h — suppress stale-check warnings
